@@ -14,7 +14,7 @@ $file_name = "";
 
 	//$language = $_POST['language'];
 	//$file_name = $_POST['file_name'];
-//$language = "es";	
+	
 if (isset($argc)) {
 	for ($i = 0; $i < $argc; $i++) {
 		// echo $argv[$i] . "\n";
@@ -52,12 +52,11 @@ else {
 
 	while($rowfile = mysqli_fetch_assoc($all_files)){
 		$file_name = $rowfile['filename'];
-		//$file_name='importMappingTypes.ts';
 			if($file_name != "" and $file_name != "language" ){
-	            $i++;
+						$i++;
 
-				echo "\r\n";
-				echo $i.'-->'.$file_name."\r\n";
+						echo $i.'-->'.$file_name."\r\n";
+						// exit();
 
 				//generate translated file
 				
@@ -65,92 +64,61 @@ else {
 				//2. Get content from file
 					
 				$file = file_get_contents('en-US/'.$file_name);
+				// print_r($file);
 				
-				// 2.1 if string is match with   "___": encode it.. 
-				$pattern = '/\".*\":/';
-				if(preg_match_all($pattern, $file, $matches))
-				{
-				$encode_str=[];
-				$decode_str=[];
-					foreach($matches[0] as $match){
-						$str=str_replace('"','',$match);
-						$str_encode=str_replace(':','',$str);
-						//echo "\r\n";
-						$en_str=base64_encode($str_encode);
-						$encode_str[$match] = '"'.$en_str.'":';
-						
-						// $decode_str['"'.$en_str.'":']='"'.base64_decode($en_str).'":';
-						$decode_str['"'.$en_str.'":']='"'.$str_encode.'":';
-					}
-				//print_r($decode_str);
-				//exit();
-				
-				//2.2. replace key with encode text
-				$replaced_encode_string = str_replace(
-				  array_keys($encode_str), 
-				  array_values($encode_str), 
-				  $file
-				);
-				
-				//echo $replaced_encode_string;
-				//exit;
 				//3. Create array from database where key = original text and value = translated text
+				
 				$sql = "SELECT * from `json_translated_text_copy` WHERE translated_lang = '".$language."' AND filename='".$file_name."'";
 				$result = mysqli_query($conn,$sql);
 				if(mysqli_num_rows($result) > 0){
-					$replaceTextArray = [];
+				
+									$replaceTextArray = [];
+
 					foreach($result as $translated_text_data){
-						if($translated_text_data['translated_text'] != ""){
-							$replaceTextArray[$translated_text_data['original_text']] = $translated_text_data['translated_text'];
-						}
+						//print_r($translated_text_data);
+						//echo "\r\n";
+						$replaceTextArray[$translated_text_data['original_text']] = $translated_text_data['translated_text'];
 					}
 				}
+				// print_r($replaceTextArray);
 				
-				
-				//4. replace text with  original text
+				//4. replace text
 				$replaced_string = str_replace(
 				  array_keys($replaceTextArray), 
 				  array_values($replaceTextArray), 
-				  $replaced_encode_string
+				  $file
 				);
-				
-				//echo $replaced_string;
-				//exit;
-				//print_r($decode_str);
-				//4.1 replace text with  original text
-				$replaced_decode_string = str_replace(
-				  array_keys($decode_str), 
-				  array_values($decode_str), 
-				  $replaced_string
-				);		
-
-				//echo $replaced_decode_string;
-				//exit;
-				// print_r($replaced_string);
-				// 5.  Check Folder Exist or not, If not Create New One
+				//5.  Check Folder Exist or not, If not Create New One
 				
 				if(is_dir($language)) {
+					// echo "The Directory {$language} exists";
 					$file = $language.'/'.$file_name;
+
 					if (file_exists($file)) {   
-						file_put_contents($file, $replaced_decode_string);
+						file_put_contents($file, $replaced_string);
 					}else{
 						$file = $language.'/'.$file_name;
 						$myfile = fopen($file, "w") or die("Unable to open file!");
 
-						fwrite($myfile, $replaced_decode_string);
+						fwrite($myfile, $replaced_string);
 						fclose($myfile);
 					}	
 				}else{
+					// echo "The Directory {$language} not exists";
+
 					mkdir($language);
 					$file = $language.'/'.$file_name;
 					$myfile = fopen($file, "w") or die("Unable to open file!");
 
-					fwrite($myfile, $replaced_decode_string);
+					fwrite($myfile, $replaced_string);
 					fclose($myfile);
 					
 				}
+				
 
-				// 6 if string is match with   "___": encode it.. 
+				
+
+				//6. save file with same name in language folder
 								
 				// file_put_contents($language.'/'.$file_name, $replaced_string);
 		
@@ -158,5 +126,5 @@ else {
 	}
 	//Loop of Multiple files END
 	
-}
+//}
 ?>
