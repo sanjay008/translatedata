@@ -1,0 +1,19 @@
+export default [
+    {"label":"AddPaymentInfo","value":"AddPaymentInfo"},
+    {"label":"AddToCart","value":"AddToCart"},
+    {"label":"AddToWishlist","value":"AddToWishlist"},
+    {"label":"CompleteRegistration","value":"CompleteRegistration"},
+    {"label":"Contact","value":"Contact"},
+    {"label":"CustomizeProduct","value":"CustomizeProduct"},
+    {"label":"Donate","value":"Donate"},
+    {"label":"FindLocation","value":"FindLocation"},
+    {"label":"InitiateCheckout","value":"InitiateCheckout"},
+    {"label":"Lead","value":"Lead"},
+    {"label":"Purchase","value":"Purchase"},
+    {"label":"Schedule","value":"Schedule"},
+    {"label":"Search","value":"Search"},
+    {"label":"StartTrial","value":"StartTrial"},
+    {"label":"SubmitApplication","value":"SubmitApplication"},
+    {"label":"Subscribe","value":"Subscribe"},
+    {"label":"ViewContent","value":"ViewContent"}
+]
